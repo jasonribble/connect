@@ -36,11 +36,11 @@ impl Update {
 }
 
 #[derive(Debug)]
-pub struct Builder {
+pub struct Construct {
     pub id: i64,
     pub update: Update,
 }
-impl Builder {
+impl Construct {
     pub fn new(
         id: i64,
         first_name: Option<String>,
@@ -120,7 +120,7 @@ impl Contact {
 mod tests {
     use crate::errors::AppError;
 
-    use super::{Builder, Contact};
+    use super::{Construct, Contact};
 
     #[test]
     fn test_display_name() {
@@ -131,8 +131,8 @@ mod tests {
     }
 
     #[test]
-    fn test_contact_update_builder() {
-        let edits = Builder::new(
+    fn test_contact_update_construct() {
+        let edits = Construct::new(
             1,
             None,
             None,
@@ -151,8 +151,8 @@ mod tests {
     }
 
     #[test]
-    fn test_contact_update_builder_2() {
-        let edits = Builder::new(
+    fn test_contact_update_construct_2() {
+        let edits = Construct::new(
             2,
             Some("Mary".to_string()),
             Some("Smith".to_string()),
@@ -172,13 +172,13 @@ mod tests {
 
     #[test]
     fn test_is_empty() {
-        let result = Builder::new(1, None, None, None, None, None);
+        let result = Construct::new(1, None, None, None, None, None);
         assert!(result.is_err());
     }
 
     #[test]
-    fn test_invalid_email_builder() {
-        let result = Builder::new(
+    fn test_invalid_email_construct() {
+        let result = Construct::new(
             1,
             None,
             None,
@@ -191,8 +191,8 @@ mod tests {
     }
 
     #[test]
-    fn test_invalid_builder_phone_number() {
-        let result = Builder::new(1, None, None, None, Some("123-123-12345".to_string()), None);
+    fn test_invalid_construct_phone_number() {
+        let result = Construct::new(1, None, None, None, Some("123-123-12345".to_string()), None);
 
         println!("{result:?}");
         assert!(result.is_err());
