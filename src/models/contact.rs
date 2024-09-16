@@ -53,7 +53,7 @@ impl Construct {
 
         if utils::is_not_valid_email(maybe_email) && Option::is_some(&email) {
             return Err(AppError::InvalidEmail(
-                email.clone().unwrap_or_else(|| String::new()),
+                email.clone().unwrap_or_default(),
             ));
         }
 
@@ -61,7 +61,7 @@ impl Construct {
 
         if utils::is_not_valid_phone_number(maybe_phone) && Option::is_some(&phone_number) {
             return Err(AppError::InvalidPhoneNumber(
-                phone_number.clone().unwrap_or_else(|| String::new()),
+                phone_number.clone().unwrap_or_default(),
             ));
         }
 
