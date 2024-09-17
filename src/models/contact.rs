@@ -52,9 +52,7 @@ impl Construct {
         let maybe_email = email.as_deref().unwrap_or("");
 
         if utils::is_not_valid_email(maybe_email) && Option::is_some(&email) {
-            return Err(AppError::InvalidEmail(
-                email.clone().unwrap_or_default(),
-            ));
+            return Err(AppError::InvalidEmail(email.clone().unwrap_or_default()));
         }
 
         let maybe_phone = phone_number.as_deref().unwrap_or("");

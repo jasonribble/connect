@@ -16,7 +16,7 @@ impl Metadata {
     fn default() -> Self {
         let now = Utc::now();
 
-        Metadata {
+        Self {
             starred: false,
             is_archived: false,
             create_at: now,

@@ -31,15 +31,14 @@ impl ContactRepo for SqliteContactRepo {
         let query = "INSERT INTO contacts
         (first_name, last_name, display_name, email, phone_number)
         VALUES (?, ?, ?, ?, ?)";
-    
         let result = sqlx::query(query)
-        .bind(&contact.first_name)
-        .bind(&contact.last_name)
-        .bind(&contact.display_name)
-        .bind(&contact.email)
-        .bind(&contact.phone_number)
-        .execute(&*self.sqlite_pool)
-        .await?;
+            .bind(&contact.first_name)
+            .bind(&contact.last_name)
+            .bind(&contact.display_name)
+            .bind(&contact.email)
+            .bind(&contact.phone_number)
+            .execute(&*self.sqlite_pool)
+            .await?;
 
         Ok(result.last_insert_rowid())
     }
