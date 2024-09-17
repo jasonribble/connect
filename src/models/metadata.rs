@@ -55,16 +55,16 @@ mod tests {
         assert_eq!(default_metadata.starred, expected_metadata.starred);
         assert_eq!(default_metadata.is_archived, expected_metadata.is_archived);
 
-        let one_second = Duration::seconds(1);
-        let created_at_time_difference =
-            (default_metadata.create_at - expected_metadata.create_at).abs();
+        let half_second = Duration::milliseconds(500);
+        let created_at_time_difference = expected_metadata.create_at - default_metadata.create_at;
 
-        assert!(created_at_time_difference <= one_second);
+        assert!(created_at_time_difference >= Duration::zero());
+        assert!(created_at_time_difference < half_second);
 
-        let updated_at_time_difference =
-            (default_metadata.updated_at - expected_metadata.updated_at).abs();
+        let updated_at_time_difference = expected_metadata.updated_at - default_metadata.updated_at;
 
-        assert!(updated_at_time_difference <= one_second);
+        assert!(created_at_time_difference >= Duration::zero());
+        assert!(updated_at_time_difference < half_second);
 
         assert!(default_metadata.updated_at <= expected_metadata.updated_at);
 
