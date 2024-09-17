@@ -4,6 +4,10 @@
 
 This is a personal CRM to help people create thriving relationship in their life.
 
+## Motivation
+
+Most CRM tools are not offline first, or privacy by design. This project attempts to solve that problem first, then try to create a seamless integration across devices.
+
 ## Development
 
 This Rust project requires the following:
@@ -25,13 +29,13 @@ This Rust project requires the following:
    cp .env.example .env
    ```
 
-3. Create the database.
+2. Create the database.
 
    ```
    $ sqlx db create
    ```
 
-4. Run sql migrations
+3. Run sql migrations
 
    ```
    $ sqlx migrate run
@@ -45,11 +49,11 @@ Create a contact
 Usage: connect create [OPTIONS]
 
 Options:
-  -f, --first-name <First Name>      
-  -l, --last-name <Last Name>        
-  -d, --display-name <Display Name>  
-  -e, --email <EMAIL>                
-  -p, --phone-number <Phone>         
+  -f, --first-name <First Name>
+  -l, --last-name <Last Name>
+  -d, --display-name <Display Name>
+  -e, --email <EMAIL>
+  -p, --phone-number <Phone>
   -h, --help                         Print help
 ```
 
@@ -66,11 +70,11 @@ Arguments:
   <ID>  ID of contact to edit
 
 Options:
-  -f, --first-name <First Name>      
-  -l, --last-name <Last Name>        
-  -d, --display-name <Display Name>  
-  -e, --email <EMAIL>                
-  -p, --phone-number <Phone>         
+  -f, --first-name <First Name>
+  -l, --last-name <Last Name>
+  -d, --display-name <Display Name>
+  -e, --email <EMAIL>
+  -p, --phone-number <Phone>
   -h, --help                         Print help
 ```
 
@@ -81,4 +85,3 @@ For example
 ## Cleanup
 
 To destroy the database, delete `contacts.db`
-
