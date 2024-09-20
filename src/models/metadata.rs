@@ -1,8 +1,8 @@
 use chrono::{DateTime, Utc};
 
-#[derive(Debug, PartialEq, Eq)]
-struct Metadata {
-    contact_id: i64,
+#[derive(Debug, PartialEq, Eq, Clone)]
+pub struct Metadata {
+    pub contact_id: i64,
     starred: bool,
     is_archived: bool,
     create_at: DateTime<Utc>,
@@ -15,7 +15,7 @@ struct Metadata {
 
 impl Metadata {
     #[allow(dead_code)]
-    fn default() -> Self {
+    pub fn default() -> Self {
         let now = Utc::now();
 
         Self {
