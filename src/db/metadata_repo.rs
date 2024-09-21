@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use crate::models;
 use async_trait::async_trait;
+use chrono::SecondsFormat;
 use sqlx::SqlitePool;
 
 #[cfg_attr(test, mockall::automock)]
@@ -25,7 +26,34 @@ impl SqliteMetadataRepo {
 #[async_trait]
 impl MetadataRepo for SqliteMetadataRepo {
    async fn create(&self, metadata: models::Metadata) -> anyhow::Result<i64> {
-      todo!();
+    let query = "INSERT INTO contact_metadata 
+    (contact_id, 
+     starred, 
+     is_archived, 
+     frequency,
+     created_at,
+     updated_at,
+     last_seen_at, 
+     next_reminder_at, 
+     last_reminder_at) 
+     VALUES (?,?,?,?,?,?,?,?,?)";
+
+    let result = sqlx::query(query)
+        .bind(&metadata.contact_id)
+        .bind(&metadata.starred)
+        .bind(&metadata.is_archived)
+        .bind(&metadata.frequency)
+
+        .bind(metadata.created_at.to_rfc3339_opts(SecondsFormat::Millis, true))
+        .bind(metadata.updated_at.to_rfc3339_opts(SecondsFormat::Millis, true))
+
+        .bind(metadata.last_seen_at.map(|dt| dt.to_rfc3339_opts(SecondsFormat::Millis, true)))
+        .bind(metadata.next_reminder_at.map(|dt| dt.to_rfc3339_opts(SecondsFormat::Millis, true)))
+        .bind(metadata.last_reminder_at.map(|dt| dt.to_rfc3339_opts(SecondsFormat::Millis, true)))
+        .execute(&*self.sqlite_pool)
+        .await?;
+
+    Ok(result.last_insert_rowid())
    }
 }
 
@@ -42,15 +70,26 @@ mod tests {
             .connect("sqlite::memory:")
             .await
             .expect("Failed to create in-memory SQLite database");
-        
-        sqlx::query("CREATE TABLE metadata (id INTEGER PRIMARY KEY, name TEXT)")
-            .execute(&pool)
-            .await
-            .expect("Failed to create metadata table");
-        
+    
+        sqlx::query(
+            "CREATE TABLE IF NOT EXISTS contact_metadata (
+                contact_id INTEGER NOT NULL,
+                starred BOOLEAN NOT NULL,
+                is_archived BOOLEAN NOT NULL,
+                created_at TEXT NOT NULL,
+                updated_at TEXT NOT NULL,
+                last_seen_at TEXT,
+                next_reminder_at TEXT,
+                frequency INTEGER,
+                last_reminder_at TEXT
+            )"
+        )
+        .execute(&pool)
+        .await
+        .expect("Failed to create contact_metadata table");
+    
         pool
     }
-
     #[tokio::test]
     async fn test_create_metadata_sqlite() {
     let pool = setup_test_db().await;

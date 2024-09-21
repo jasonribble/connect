@@ -3,14 +3,14 @@ use chrono::{DateTime, Utc};
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Metadata {
     pub contact_id: i64,
-    starred: bool,
-    is_archived: bool,
-    create_at: DateTime<Utc>,
-    updated_at: DateTime<Utc>,
-    last_seen_at: Option<DateTime<Utc>>,
-    next_reminder_at: Option<DateTime<Utc>>,
-    frequency: Option<String>,
-    last_reminder_at: Option<DateTime<Utc>>,
+    pub starred: bool,
+    pub is_archived: bool,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+    pub last_seen_at: Option<DateTime<Utc>>,
+    pub next_reminder_at: Option<DateTime<Utc>>,
+    pub frequency: Option<String>,
+    pub last_reminder_at: Option<DateTime<Utc>>,
 }
 
 impl Metadata {
@@ -22,7 +22,7 @@ impl Metadata {
             contact_id: 0,
             starred: false,
             is_archived: false,
-            create_at: now,
+            created_at: now,
             updated_at: now,
             last_seen_at: None,
             next_reminder_at: None,
@@ -48,7 +48,7 @@ mod tests {
             contact_id: 0,
             starred: false,
             is_archived: false,
-            create_at: now,
+            created_at: now,
             updated_at: now,
             last_seen_at: None,
             next_reminder_at: None,
@@ -62,7 +62,7 @@ mod tests {
         assert_eq!(default_metadata.is_archived, expected_metadata.is_archived);
 
         let half_second = Duration::milliseconds(500);
-        let created_at_time_difference = expected_metadata.create_at - default_metadata.create_at;
+        let created_at_time_difference = expected_metadata.created_at - default_metadata.created_at;
 
         assert!(created_at_time_difference >= Duration::zero());
         assert!(created_at_time_difference < half_second);
