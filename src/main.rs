@@ -8,7 +8,7 @@ mod utils;
 
 use clap::Parser;
 use commander::{Cli, Commands};
-use db::{ContactRepo, SqliteContactRepo};
+use db::{ContactRepo, Connection};
 use models::{Contact, ContactBuilder};
 use sqlx::SqlitePool;
 
@@ -18,7 +18,7 @@ async fn main() -> anyhow::Result<()> {
 
     let pool = SqlitePool::connect(&env::var("DATABASE_URL")?).await?;
 
-    let contact_repo = SqliteContactRepo::new(pool);
+    let contact_repo = Connection::new(pool);
 
     let cli = Cli::parse();
 

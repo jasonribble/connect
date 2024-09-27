@@ -11,11 +11,11 @@ pub trait MetadataRepo {
     async fn create(&self, metadata: models::Metadata) -> anyhow::Result<i64>;
 }
 
-pub struct SqliteMetadataRepo {
+pub struct DbPool {
     sqlite_pool: Arc<SqlitePool>,
 }
 
-impl SqliteMetadataRepo {
+impl DbPool {
     pub fn new(pool: SqlitePool) -> Self {
         Self {
             sqlite_pool: Arc::new(pool),
@@ -24,7 +24,7 @@ impl SqliteMetadataRepo {
 }
 
 #[async_trait]
-impl MetadataRepo for SqliteMetadataRepo {
+impl MetadataRepo for DbPool {
    async fn create(&self, metadata: models::Metadata) -> anyhow::Result<i64> {
     let query = "INSERT INTO contact_metadata 
     (contact_id, 
@@ -39,10 +39,10 @@ impl MetadataRepo for SqliteMetadataRepo {
      VALUES (?,?,?,?,?,?,?,?,?)";
 
     let result = sqlx::query(query)
-        .bind(&metadata.contact_id)
-        .bind(&metadata.starred)
-        .bind(&metadata.is_archived)
-        .bind(&metadata.frequency)
+        .bind(metadata.contact_id)
+        .bind(metadata.starred)
+        .bind(metadata.is_archived)
+        .bind(metadata.frequency)
 
         .bind(metadata.created_at.to_rfc3339_opts(SecondsFormat::Millis, true))
         .bind(metadata.updated_at.to_rfc3339_opts(SecondsFormat::Millis, true))
@@ -93,7 +93,7 @@ mod tests {
     #[tokio::test]
     async fn test_create_metadata_sqlite() {
     let pool = setup_test_db().await;
-    let repo = SqliteMetadataRepo::new(pool);
+    let repo = DbPool::new(pool);
 
     let test_metadata = models::Metadata::default();
 

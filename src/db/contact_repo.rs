@@ -13,11 +13,11 @@ pub trait ContactRepo {
     async fn get_by_id(&self, id: i64) -> anyhow::Result<models::IndexedContact>;
 }
 
-pub struct SqliteContactRepo {
+pub struct Connection {
     sqlite_pool: Arc<SqlitePool>,
 }
 
-impl SqliteContactRepo {
+impl Connection {
     pub fn new(pool: SqlitePool) -> Self {
         Self {
             sqlite_pool: Arc::new(pool),
@@ -26,7 +26,7 @@ impl SqliteContactRepo {
 }
 
 #[async_trait]
-impl ContactRepo for SqliteContactRepo {
+impl ContactRepo for Connection {
     async fn create(&self, contact: models::Contact) -> anyhow::Result<i64> {
         let query = "INSERT INTO contacts
         (first_name, last_name, display_name, email, phone_number)
