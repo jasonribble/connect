@@ -11,11 +11,11 @@ pub trait MetadataRepo {
     async fn create(&self, metadata: models::Metadata) -> anyhow::Result<i64>;
 }
 
-pub struct DbPool {
+pub struct Connection {
     sqlite_pool: Arc<SqlitePool>,
 }
 
-impl DbPool {
+impl Connection {
     pub fn new(pool: SqlitePool) -> Self {
         Self {
             sqlite_pool: Arc::new(pool),
@@ -24,7 +24,7 @@ impl DbPool {
 }
 
 #[async_trait]
-impl MetadataRepo for DbPool {
+impl MetadataRepo for Connection {
    async fn create(&self, metadata: models::Metadata) -> anyhow::Result<i64> {
     let query = "INSERT INTO contact_metadata 
     (contact_id, 
@@ -93,7 +93,7 @@ mod tests {
     #[tokio::test]
     async fn test_create_metadata_sqlite() {
     let pool = setup_test_db().await;
-    let repo = DbPool::new(pool);
+    let repo = Connection::new(pool);
 
     let test_metadata = models::Metadata::default();
 
