@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone, sqlx::FromRow)]
 pub struct Metadata {
     pub contact_id: i64,
     pub starred: bool,
