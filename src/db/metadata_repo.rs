@@ -75,7 +75,7 @@ impl MetadataRepo for Connection {
         Ok(result.last_insert_rowid())
     }
     async fn get_by_id(&self, contact_id: i64) -> anyhow::Result<models::Metadata> {
-        let query_get_by_id = "SELECT * FROM metadata WHERE contact_id=$1";
+        let query_get_by_id = "SELECT * FROM contact_metadata WHERE contact_id=$1";
 
         let metadata: models::Metadata = sqlx::query_as::<_, models::Metadata>(query_get_by_id)
             .bind(contact_id)
