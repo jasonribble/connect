@@ -2,7 +2,9 @@
 name = "nbd"
 version = "0.1.0"
 edition = "2021"
-author = "Jason Ribble jason@companionops.com"
+
+[package.metadata]
+authors = ["Jason Ribble <jason@companionops.com>"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
