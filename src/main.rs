@@ -8,7 +8,7 @@ mod utils;
 
 use clap::Parser;
 use commander::{Cli, Commands};
-use db::{ContactRepo, ContactConnection};
+use db::{Connection, ContactRepo};
 use models::{Contact, ContactBuilder};
 use sqlx::SqlitePool;
 
@@ -18,7 +18,7 @@ async fn main() -> anyhow::Result<()> {
 
     let pool = SqlitePool::connect(&env::var("DATABASE_URL")?).await?;
 
-    let contact_repo = ContactConnection::new(pool);
+    let data_repo = Connection::new(pool);
 
     let cli = Cli::parse();
 
@@ -35,25 +35,32 @@ async fn main() -> anyhow::Result<()> {
 
             let contact = contact.unwrap();
 
-            let id = contact_repo.create(contact).await?;
+            let id = data_repo.create_contact(contact).await?;
 
             println!("Successfully saved contact {id}");
         }
         Commands::Edit(value) => {
-            let contact = ContactBuilder::new(value.id, value.first_name.clone(), value.last_name.clone(), value.display_name.clone(), value.email.clone(), value.phone_number.clone()).unwrap();
+            let contact = ContactBuilder::new(
+                value.id,
+                value.first_name.clone(),
+                value.last_name.clone(),
+                value.display_name.clone(),
+                value.email.clone(),
+                value.phone_number.clone(),
+            )
+            .unwrap();
 
-
-            let _ = contact_repo.update(contact).await;
+            let _ = data_repo.update_contact(contact).await;
         }
         Commands::Show => {
-            let contacts = contact_repo.get_all().await?;
+            let contacts = data_repo.get_all_contacts().await?;
 
             println!("{contacts:?}");
         }
         Commands::Get(value) => {
             let id = value.id;
 
-            let contact = contact_repo.get_by_id(id).await?;
+            let contact = data_repo.get_contact_by_id(id).await?;
 
             println!("{contact:?}");
         }

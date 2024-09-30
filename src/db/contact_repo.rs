@@ -1,33 +1,20 @@
-use std::sync::Arc;
-
 use crate::models;
 use async_trait::async_trait;
-use sqlx::SqlitePool;
+
+use super::connection::Connection;
 
 #[cfg_attr(test, mockall::automock)]
 #[async_trait]
 pub trait ContactRepo {
-    async fn create(&self, contact: models::Contact) -> anyhow::Result<i64>;
-    async fn get_all(&self) -> anyhow::Result<Vec<models::IndexedContact>>;
-    async fn update(&self, update: models::ContactBuilder) -> anyhow::Result<()>;
-    async fn get_by_id(&self, id: i64) -> anyhow::Result<models::IndexedContact>;
-}
-
-pub struct Connection {
-    sqlite_pool: Arc<SqlitePool>,
-}
-
-impl Connection {
-    pub fn new(pool: SqlitePool) -> Self {
-        Self {
-            sqlite_pool: Arc::new(pool),
-        }
-    }
+    async fn create_contact(&self, contact: models::Contact) -> anyhow::Result<i64>;
+    async fn get_all_contacts(&self) -> anyhow::Result<Vec<models::IndexedContact>>;
+    async fn update_contact(&self, update: models::ContactBuilder) -> anyhow::Result<()>;
+    async fn get_contact_by_id(&self, id: i64) -> anyhow::Result<models::IndexedContact>;
 }
 
 #[async_trait]
 impl ContactRepo for Connection {
-    async fn create(&self, contact: models::Contact) -> anyhow::Result<i64> {
+    async fn create_contact(&self, contact: models::Contact) -> anyhow::Result<i64> {
         let query = "INSERT INTO contacts
         (first_name, last_name, display_name, email, phone_number)
         VALUES (?, ?, ?, ?, ?)";
@@ -43,7 +30,7 @@ impl ContactRepo for Connection {
         Ok(result.last_insert_rowid())
     }
 
-    async fn get_all(&self) -> anyhow::Result<Vec<models::IndexedContact>> {
+    async fn get_all_contacts(&self) -> anyhow::Result<Vec<models::IndexedContact>> {
         let get_contacts_query =
             "SELECT id, first_name, last_name, display_name, email, phone_number
              FROM contacts
@@ -57,7 +44,7 @@ impl ContactRepo for Connection {
         Ok(contacts_with_id)
     }
 
-    async fn update(&self, contact: models::ContactBuilder) -> anyhow::Result<()> {
+    async fn update_contact(&self, contact: models::ContactBuilder) -> anyhow::Result<()> {
         sqlx::query!(
             r#"
             UPDATE contacts
@@ -84,7 +71,7 @@ impl ContactRepo for Connection {
         Ok(())
     }
 
-    async fn get_by_id(&self, id: i64) -> anyhow::Result<models::IndexedContact> {
+    async fn get_contact_by_id(&self, id: i64) -> anyhow::Result<models::IndexedContact> {
         let query_get_by_id = "SELECT * FROM contacts WHERE id=$1";
 
         let contact: models::IndexedContact =
@@ -110,12 +97,12 @@ mod tests {
             models::Contact::new("John", "Smith", "johndoe@example.com", "123-456-7890").unwrap();
 
         mock_contact_repo
-            .expect_create()
+            .expect_create_contact()
             .times(1)
             .with(eq(test_contact.clone()))
             .returning(|_| Ok(1));
 
-        let result = mock_contact_repo.create(test_contact).await;
+        let result = mock_contact_repo.create_contact(test_contact).await;
 
         let result = result.unwrap();
 
@@ -133,11 +120,11 @@ mod tests {
         }];
 
         mock_contact_repo
-            .expect_get_all()
+            .expect_get_all_contacts()
             .times(1)
             .return_once(move || Ok(contacts));
 
-        let result = mock_contact_repo.get_all().await;
+        let result = mock_contact_repo.get_all_contacts().await;
 
         assert!(result.is_ok());
     }
@@ -147,7 +134,7 @@ mod tests {
         let mut mock_contact_repo = MockContactRepo::new();
 
         mock_contact_repo
-            .expect_update()
+            .expect_update_contact()
             .times(1)
             .return_once(|_| Ok(()));
 
@@ -161,7 +148,7 @@ mod tests {
         )
         .unwrap();
 
-        let result = mock_contact_repo.update(edits).await;
+        let result = mock_contact_repo.update_contact(edits).await;
 
         assert!(result.is_ok());
     }
@@ -177,12 +164,12 @@ mod tests {
         };
 
         mock_contact_repo
-            .expect_get_by_id()
+            .expect_get_contact_by_id()
             .times(1)
             .with(eq(contact.id))
             .return_once(|_| Ok(contact));
 
-        let result = mock_contact_repo.get_by_id(1).await;
+        let result = mock_contact_repo.get_contact_by_id(1).await;
 
         assert!(result.is_ok());
 

@@ -1,7 +1,7 @@
 use sqlx::{sqlite::SqlitePoolOptions, SqlitePool};
 
 use crate::{
-    db::{ContactConnection, ContactRepo, MetadataConnection, MetadataRepo},
+    db::{Connection, ContactRepo, MetadataRepo},
     models::{Contact, Metadata},
 };
 
@@ -50,20 +50,19 @@ async fn setup_test_db() -> SqlitePool {
 async fn test_create_contact_get_metadata() {
     let pool = setup_test_db().await;
 
-    let contact_repo = ContactConnection::new(pool.clone());
-    let metadata_repo = MetadataConnection::new(pool.clone());
+    let data_repo = Connection::new(pool);
 
     let example_contact =
         Contact::new("Lewis", "Carroll", "lewis@wonderland.com", "777-777-7777").unwrap();
 
-    let result_contact_id = contact_repo.create(example_contact).await;
+    let result_contact_id = data_repo.create_contact(example_contact).await;
     let contact_id = result_contact_id.unwrap();
 
     assert_eq!(contact_id, 1);
 
     let default_metadata = Metadata::default();
 
-    let result_expected_metadata = metadata_repo.get_by_id(contact_id).await;
+    let result_expected_metadata = data_repo.get_metadata_by_id(contact_id).await;
     let expected_metadata = result_expected_metadata.unwrap();
 
     assert_eq!(default_metadata, expected_metadata);

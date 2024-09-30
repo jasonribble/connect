@@ -1,32 +1,19 @@
-use std::sync::Arc;
-
 use crate::models;
 use async_trait::async_trait;
 use chrono::SecondsFormat;
-use sqlx::SqlitePool;
+
+use super::Connection;
 
 #[cfg_attr(test, mockall::automock)]
 #[async_trait]
 pub trait MetadataRepo {
-    async fn create(&self, metadata: models::Metadata) -> anyhow::Result<i64>;
-    async fn get_by_id(&self, contact_id: i64) -> anyhow::Result<models::Metadata>;
-}
-
-pub struct Connection {
-    sqlite_pool: Arc<SqlitePool>,
-}
-
-impl Connection {
-    pub fn new(pool: SqlitePool) -> Self {
-        Self {
-            sqlite_pool: Arc::new(pool),
-        }
-    }
+    async fn create_metadata(&self, metadata: models::Metadata) -> anyhow::Result<i64>;
+    async fn get_metadata_by_id(&self, contact_id: i64) -> anyhow::Result<models::Metadata>;
 }
 
 #[async_trait]
 impl MetadataRepo for Connection {
-    async fn create(&self, metadata: models::Metadata) -> anyhow::Result<i64> {
+    async fn create_metadata(&self, metadata: models::Metadata) -> anyhow::Result<i64> {
         let query = "INSERT INTO contact_metadata 
     (contact_id, 
      starred, 
@@ -74,7 +61,7 @@ impl MetadataRepo for Connection {
 
         Ok(result.last_insert_rowid())
     }
-    async fn get_by_id(&self, contact_id: i64) -> anyhow::Result<models::Metadata> {
+    async fn get_metadata_by_id(&self, contact_id: i64) -> anyhow::Result<models::Metadata> {
         let query_get_by_id = "SELECT * FROM contact_metadata WHERE contact_id=$1";
 
         let metadata: models::Metadata = sqlx::query_as::<_, models::Metadata>(query_get_by_id)
@@ -125,7 +112,7 @@ mod tests {
 
         let test_metadata = models::Metadata::default();
 
-        let result = repo.create(test_metadata.clone()).await.unwrap();
+        let result = repo.create_metadata(test_metadata.clone()).await.unwrap();
         assert!(result > 0);
     }
 
@@ -136,12 +123,12 @@ mod tests {
         let test_metadata = models::Metadata::default();
 
         mock_metadata_repo
-            .expect_create()
+            .expect_create_metadata()
             .times(1)
             .with(eq(test_metadata.clone()))
             .returning(|_| Ok(1));
 
-        let result = mock_metadata_repo.create(test_metadata).await;
+        let result = mock_metadata_repo.create_metadata(test_metadata).await;
 
         let result = result.unwrap();
 
@@ -161,12 +148,12 @@ mod tests {
         let test_metadata_clone = test_metadata.clone();
 
         mock_metadata_repo
-            .expect_get_by_id()
+            .expect_get_metadata_by_id()
             .times(1)
             .with(eq(1))
             .returning(move |_| Ok(test_metadata_clone.clone()));
 
-        let result = mock_metadata_repo.get_by_id(1).await;
+        let result = mock_metadata_repo.get_metadata_by_id(1).await;
 
         assert!(result.is_ok());
 
