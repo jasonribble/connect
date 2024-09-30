@@ -1,4 +1,4 @@
-use crate::models;
+use crate::models::{self, Metadata};
 use async_trait::async_trait;
 use chrono::SecondsFormat;
 
@@ -7,14 +7,14 @@ use super::Connection;
 #[cfg_attr(test, mockall::automock)]
 #[async_trait]
 pub trait MetadataRepo {
-    async fn create_metadata(&self, metadata: models::Metadata) -> anyhow::Result<i64>;
+    async fn create_metadata(&self, contact_id: i64) -> anyhow::Result<Metadata>;
     async fn get_metadata_by_id(&self, contact_id: i64) -> anyhow::Result<models::Metadata>;
 }
 
 #[async_trait]
 impl MetadataRepo for Connection {
-    async fn create_metadata(&self, metadata: models::Metadata) -> anyhow::Result<i64> {
-        let query = "INSERT INTO contact_metadata 
+    async fn create_metadata(&self, contact_id: i64) -> anyhow::Result<Metadata> {
+        let query = "INSERT INTO contacts_metadata 
     (contact_id, 
      starred, 
      is_archived, 
@@ -26,11 +26,13 @@ impl MetadataRepo for Connection {
      last_reminder_at) 
      VALUES (?,?,?,?,?,?,?,?,?)";
 
-        let result = sqlx::query(query)
+        let metadata = Metadata::new(contact_id);
+
+        sqlx::query(query)
             .bind(metadata.contact_id)
             .bind(metadata.starred)
             .bind(metadata.is_archived)
-            .bind(metadata.frequency)
+            .bind(metadata.frequency.clone())
             .bind(
                 metadata
                     .created_at
@@ -59,10 +61,11 @@ impl MetadataRepo for Connection {
             .execute(&*self.sqlite_pool)
             .await?;
 
-        Ok(result.last_insert_rowid())
+        // Fetch the inserted metadata
+        self.get_metadata_by_id(contact_id).await
     }
     async fn get_metadata_by_id(&self, contact_id: i64) -> anyhow::Result<models::Metadata> {
-        let query_get_by_id = "SELECT * FROM contact_metadata WHERE contact_id=$1";
+        let query_get_by_id = "SELECT * FROM contacts_metadata WHERE contact_id=$1";
 
         let metadata: models::Metadata = sqlx::query_as::<_, models::Metadata>(query_get_by_id)
             .bind(contact_id)
@@ -87,7 +90,7 @@ mod tests {
             .expect("Failed to create in-memory SQLite database");
 
         sqlx::query(
-            "CREATE TABLE IF NOT EXISTS contact_metadata (
+            "CREATE TABLE IF NOT EXISTS contacts_metadata (
                 contact_id INTEGER NOT NULL,
                 starred BOOLEAN NOT NULL,
                 is_archived BOOLEAN NOT NULL,
@@ -101,7 +104,7 @@ mod tests {
         )
         .execute(&pool)
         .await
-        .expect("Failed to create contact_metadata table");
+        .expect("Failed to create contacts_metadata table");
 
         pool
     }
@@ -110,39 +113,39 @@ mod tests {
         let pool = setup_test_db().await;
         let repo = Connection::new(pool);
 
-        let test_metadata = models::Metadata::default();
+        let contact_id = 1;
 
-        let result = repo.create_metadata(test_metadata.clone()).await.unwrap();
-        assert!(result > 0);
+        let result = repo.create_metadata(contact_id).await.unwrap();
+
+        assert_eq!(result.contact_id, contact_id);
     }
 
     #[tokio::test]
     async fn test_create_metadata() {
         let mut mock_metadata_repo = MockMetadataRepo::new();
 
-        let test_metadata = models::Metadata::default();
+        let test_metadata = models::Metadata::new(1);
+        let returning_metadata = models::Metadata::new(1);
 
         mock_metadata_repo
             .expect_create_metadata()
             .times(1)
-            .with(eq(test_metadata.clone()))
-            .returning(|_| Ok(1));
+            .returning(move |_| Ok(returning_metadata.clone()));
 
-        let result = mock_metadata_repo.create_metadata(test_metadata).await;
+        let result = mock_metadata_repo
+            .create_metadata(test_metadata.contact_id)
+            .await;
 
         let result = result.unwrap();
 
-        assert_eq!(result, 1);
+        assert_eq!(result.contact_id, 1);
     }
 
     #[tokio::test]
     async fn test_get_metadata() {
         let mut mock_metadata_repo = MockMetadataRepo::new();
 
-        let test_metadata = models::Metadata {
-            contact_id: 1,
-            ..models::Metadata::default()
-        };
+        let test_metadata = models::Metadata::new(1);
 
         // Clone test_metadata before using it in the closure
         let test_metadata_clone = test_metadata.clone();

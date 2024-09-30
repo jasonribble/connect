@@ -15,11 +15,11 @@ pub struct Metadata {
 
 impl Metadata {
     #[allow(dead_code)]
-    pub fn default() -> Self {
+    pub fn new(contact_id: i64) -> Self {
         let now = Utc::now();
 
         Self {
-            contact_id: 0,
+            contact_id,
             starred: false,
             is_archived: false,
             created_at: now,
@@ -40,12 +40,12 @@ mod tests {
 
     #[test]
     fn test_has_default() {
-        let default_metadata = Metadata::default();
+        let default_metadata = Metadata::new(1);
 
         let now = Utc::now();
 
         let expected_metadata = Metadata {
-            contact_id: 0,
+            contact_id: 1,
             starred: false,
             is_archived: false,
             created_at: now,

@@ -1,7 +1,7 @@
 use crate::models;
 use async_trait::async_trait;
 
-use super::connection::Connection;
+use super::{connection::Connection, MetadataRepo};
 
 #[cfg_attr(test, mockall::automock)]
 #[async_trait]
@@ -27,7 +27,12 @@ impl ContactRepo for Connection {
             .execute(&*self.sqlite_pool)
             .await?;
 
-        Ok(result.last_insert_rowid())
+        let contact_id = result.last_insert_rowid();
+
+        // Creates metadata for that contact
+        self.create_metadata(contact_id).await?;
+
+        Ok(contact_id)
     }
 
     async fn get_all_contacts(&self) -> anyhow::Result<Vec<models::IndexedContact>> {
