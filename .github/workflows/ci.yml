@@ -10,7 +10,25 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  prepare_database:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Build release
+        run: cargo build --release
+
+  unit:
+    name: Commit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo test --bins
+
+  integration:
     name: Integration Tests
     runs-on: ubuntu-latest
     steps:
@@ -35,14 +53,6 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-  test:
-    name: Commit Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - run: cargo test --bins
-
   lint:
     name: Linting
     runs-on: ubuntu-latest
@@ -53,19 +63,3 @@ jobs:
           components: clippy
       - name: Lint check
         run: cargo clippy -- -D clippy::pedantic -W clippy::nursery
-
-  build_and_upload:
-    name: Build and Upload Artifact
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-
-      - name: Build release
-        run: cargo build --release
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: connect
-          path: target/release/connect
