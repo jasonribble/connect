@@ -1,10 +1,10 @@
-# Companion Connect
+# No Big Deal - A Connection Cultivator
 
-[![Commit Phase](https://github.com/jasonribble/connect/actions/workflows/ci.yml/badge.svg)](https://github.com/jasonribble/connect/actions/workflows/ci.yml)
+[![Commit Phase](https://github.com/jasonribble/nbd/actions/workflows/ci.yml/badge.svg)](https://github.com/jasonribble/nbd/actions/workflows/ci.yml)
 
 ## Description
 
-This is a personal CRM to help people create thriving relationship in their life.
+This is a personal contact management to help people create and maintain thriving relationship in their life.
 
 ## Motivation
 
@@ -48,7 +48,7 @@ This Rust project requires the following:
 Create a contact
 
 ```
-Usage: connect create [OPTIONS]
+Usage: nbd create [OPTIONS]
 
 Options:
   -f, --first-name <First Name>
