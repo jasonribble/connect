@@ -21,7 +21,7 @@ jobs:
         run: cargo build --release
 
   unit:
-    name: Commit Tests
+    name: Unit Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -53,7 +53,29 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-  lint:
+
+  component:
+    name: Component Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Run integration
+        run: cargo test --test component
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+  contract:
+    name: Contract Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Run integration
+        run: cargo test --test contract
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
     name: Linting
     runs-on: ubuntu-latest
     steps:
