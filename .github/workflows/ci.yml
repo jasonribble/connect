@@ -59,7 +59,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - name: Run integration
+
+      - name: Install sqlx-cli
+        run: cargo install sqlx-cli
+
+      - name: Create database
+        run: sqlx database create
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Run migrations
+        run: sqlx migrate run
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Run component tests
         run: cargo test --test component
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -70,7 +84,21 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - name: Run integration
+
+      - name: Install sqlx-cli
+        run: cargo install sqlx-cli
+
+      - name: Create database
+        run: sqlx database create
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Run migrations
+        run: sqlx migrate run
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+      - name: Run contract tests
         run: cargo test --test contract
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
