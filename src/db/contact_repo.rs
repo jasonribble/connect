@@ -10,6 +10,7 @@ pub trait ContactRepo {
     async fn get_all_contacts(&self) -> anyhow::Result<Vec<models::IndexedContact>>;
     async fn update_contact(&self, update: models::ContactBuilder) -> anyhow::Result<()>;
     async fn get_contact_by_id(&self, id: i64) -> anyhow::Result<models::IndexedContact>;
+    async fn delete_contact_by_id(&self, id: i64) -> anyhow::Result<i64>;
 }
 
 #[async_trait]
@@ -86,6 +87,17 @@ impl ContactRepo for Connection {
                 .await?;
 
         Ok(contact)
+    }
+
+    async fn delete_contact_by_id(&self, id: i64) -> anyhow::Result<i64> {
+        let query_delete_by_id = "DELETE FROM contacts WHERE id=$1 RETURNING id";
+
+        let contact_id = sqlx::query(query_delete_by_id)
+            .bind(id)
+            .execute(&*self.sqlite_pool)
+            .await?;
+
+        Ok(contact_id.last_insert_rowid())
     }
 }
 
