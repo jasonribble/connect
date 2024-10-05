@@ -80,4 +80,32 @@ mod tests {
 
         assert_eq!(contact_id, expected_metadata.contact_id);
     }
+
+    #[tokio::test]
+    async fn test_delete_contact_deletes_metadata() {
+        let pool = setup_test_db().await;
+
+        let data_repo = Connection::new(pool);
+
+        let example_contact =
+            Contact::new("Lewis", "Carroll", "lewis@wonderland.com", "777-777-7777").unwrap();
+
+        let result_contact_id = data_repo.create_contact(example_contact.clone()).await;
+
+        let contact_id = result_contact_id.unwrap();
+
+        let contact_from_database = data_repo.get_contact_by_id(contact_id).await;
+        let contact_from_database = contact_from_database.unwrap();
+
+        assert_eq!(
+            contact_from_database.contact.first_name,
+            example_contact.first_name
+        );
+
+        let deleted_contact_id = data_repo.delete_contact_by_id(contact_id).await.unwrap();
+
+        let failed_contact_metadata = data_repo.get_metadata_by_id(deleted_contact_id).await;
+
+        assert!(failed_contact_metadata.is_err());
+    }
 }
