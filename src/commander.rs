@@ -20,6 +20,9 @@ pub enum Commands {
 
     /// Get a contact
     Get(GetCommand),
+
+    /// Delete a contact
+    Delete(DeleteCommand),
 }
 
 #[derive(Args)]
@@ -64,5 +67,11 @@ pub struct EditCommand {
 #[derive(Args, Debug)]
 pub struct GetCommand {
     /// ID of contact to get
+    pub id: i64,
+}
+
+#[derive(Args, Debug)]
+pub struct DeleteCommand {
+    /// ID of contact to delete
     pub id: i64,
 }
