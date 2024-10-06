@@ -1,7 +1,7 @@
 mod connection;
 mod contact_repo;
+mod fake_db;
 mod metadata_repo;
-mod migrations;
 
 pub use connection::Connection;
 
