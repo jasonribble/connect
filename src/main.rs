@@ -69,7 +69,7 @@ async fn main() -> anyhow::Result<()> {
 
             let contact_id = data_repo.delete_contact_by_id(id).await?;
 
-            println!("Successfully deleted contact {contact_id}")
+            println!("Successfully deleted contact {contact_id}");
         }
     }
 
