@@ -49,7 +49,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Run integration
-        run: cargo test --test integration
+        run: cargo test --test cli
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
