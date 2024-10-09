@@ -42,6 +42,9 @@ pub struct Construct {
     pub update: Update,
 }
 impl Construct {
+    /// # Errors
+    ///
+    /// This errors if there is an invalid email or phone number
     pub fn new(
         id: i64,
         first_name: Option<String>,
@@ -90,6 +93,9 @@ impl Construct {
 }
 
 impl Contact {
+    /// # Errors
+    ///
+    /// This errors if there is an invalid email or phone number
     pub fn new(
         first_name: &str,
         last_name: &str,

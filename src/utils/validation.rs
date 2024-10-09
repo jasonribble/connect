@@ -7,6 +7,7 @@ fn is_valid_phone_number(phone: &str) -> bool {
     phone_regex.is_match(phone)
 }
 
+#[must_use]
 pub fn is_not_valid_phone_number(phone_number: &str) -> bool {
     !is_valid_phone_number(phone_number)
 }
@@ -17,6 +18,7 @@ fn is_valid_email(email: &str) -> bool {
     email_regex.is_match(email)
 }
 
+#[must_use]
 pub fn is_not_valid_email(email: &str) -> bool {
     !is_valid_email(email)
 }

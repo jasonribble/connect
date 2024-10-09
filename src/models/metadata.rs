@@ -14,7 +14,7 @@ pub struct Metadata {
 }
 
 impl Metadata {
-    #[allow(dead_code)]
+    #[must_use]
     pub fn new(contact_id: i64) -> Self {
         let now = Utc::now();
 

@@ -5,6 +5,7 @@ pub struct Connection {
 }
 
 impl Connection {
+    #[must_use]
     pub fn new(pool: SqlitePool) -> Self {
         Self {
             sqlite_pool: Arc::new(pool),
