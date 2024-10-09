@@ -22,3 +22,11 @@ tokio = { version = "1.28.0", features = ["full", "test-util"] }
 mockall = "0.12.1"
 assert_cmd = "2.0.14"
 predicates = "3.1"
+
+[[bin]]
+name = "nbd-cli"
+path = "src/cli/main.rs"
+
+[lib]
+name = "nbd"
+path = "src/lib.rs"

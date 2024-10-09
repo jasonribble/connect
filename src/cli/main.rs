@@ -1,10 +1,7 @@
 use std::env;
 
 mod commander;
-mod db;
-mod errors;
-mod models;
-mod utils;
+use nbd::{db, models};
 
 use clap::Parser;
 use commander::{Cli, Commands};

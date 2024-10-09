@@ -1,4 +1,5 @@
-use crate::{errors::AppError, utils};
+use crate::utils;
+use crate::utils::AppError;
 
 #[derive(Debug, PartialEq, Eq, Clone, sqlx::FromRow)]
 pub struct Contact {
@@ -116,7 +117,7 @@ impl Contact {
 }
 #[cfg(test)]
 mod tests {
-    use crate::errors::AppError;
+    use crate::utils::AppError;
 
     use super::{Construct, Contact};
 

@@ -4,13 +4,19 @@ mod tests {
     use assert_cmd::Command;
 
     fn create_command() -> Command {
-        Command::cargo_bin(env!("CARGO_PKG_NAME")).unwrap()
+        Command::cargo_bin(get_cli_name()).unwrap()
+    }
+
+    fn get_cli_name() -> String {
+        let package_name = env!("CARGO_PKG_NAME");
+        let cli_name = format!("{}-cli", package_name);
+        cli_name.to_string()
     }
 
     #[test]
-    fn test_crate_name() {
-        let crate_name = env!("CARGO_PKG_NAME");
-        assert_eq!(crate_name, "nbd");
+    fn test_cli_name() {
+        let crate_name = get_cli_name();
+        assert_eq!(crate_name, "nbd-cli");
     }
 
     #[test]
@@ -18,7 +24,7 @@ mod tests {
         let mut cmd = create_command();
         cmd.arg("--help");
 
-        let stdout = format!("Usage: {} <COMMAND>", env!("CARGO_PKG_NAME"));
+        let stdout = format!("Usage: {} <COMMAND>", get_cli_name());
 
         cmd.assert()
             .success()
@@ -113,7 +119,7 @@ mod tests {
         let mut cmd = create_command();
         cmd.arg("First").arg("Last").arg("32321123");
 
-        let stderr = format!("Usage: {} <COMMAND>", env!("CARGO_PKG_NAME"));
+        let stderr = format!("Usage: {} <COMMAND>", get_cli_name());
 
         cmd.assert()
             .failure()
