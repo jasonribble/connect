@@ -51,6 +51,7 @@ jobs:
       - name: Run CLI tests
         run: cargo test --test cli
         env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SQLX_OFFLINE: true
 
   lint:
