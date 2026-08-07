@@ -20,39 +20,40 @@ jobs:
       - name: Build release
         run: cargo build --release
 
-  unit:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@stable
-      - run: cargo test --bins
+unit:
+  name: Unit Tests
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v7
+    - uses: dtolnay/rust-toolchain@stable
+    - uses: taiki-e/install-action@nextest
+    - run: cargo nextest run --bins
 
-  integration:
-    name: Integration Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-      - uses: dtolnay/rust-toolchain@stable
+integration:
+  name: Integration Tests
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v7
+    - uses: dtolnay/rust-toolchain@stable
+    - uses: taiki-e/install-action@nextest
+    - name: Install sqlx-cli
+      run: cargo install sqlx-cli
 
-      - name: Install sqlx-cli
-        run: cargo install sqlx-cli
+    - name: Create database
+      run: sqlx database create
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      - name: Create database
-        run: sqlx database create
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    - name: Check sqlx queries are up to date
+      run: cargo sqlx prepare --check -- --all-targets --all-features
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      - name: Check sqlx queries are up to date
-        run: cargo sqlx prepare --check -- --all-targets --all-features
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-
-      - name: Run CLI tests
-        run: cargo test --test cli
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          SQLX_OFFLINE: true
+    - name: Run CLI tests
+      run: cargo nextest run --test cli
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        SQLX_OFFLINE: true
 
   lint:
     name: Linting
