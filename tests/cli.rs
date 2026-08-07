@@ -1,5 +1,4 @@
-#![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic_in_result_fn)]
-#[cfg(test)]
+#![cfg_attr(test, allow(clippy::panic_in_result_fn))]
 mod tests {
     use anyhow::Result;
     use assert_cmd::{cargo, Command};
@@ -7,7 +6,6 @@ mod tests {
         db::{ContactRepo, Repo},
         models::Contact,
     };
-    use serial_test::serial;
     use sqlx::SqlitePool;
 
     fn create_command() -> Command {
@@ -106,7 +104,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[serial]
     async fn should_be_able_to_create_full_contact() {
         clean_database().await.expect("Failed to clean database");
 
@@ -129,7 +126,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[serial]
     async fn should_delete_a_contact_when_one_is_present() -> Result<()> {
         clean_database().await.expect("Failed to clean database");
 
@@ -152,7 +148,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[serial]
     async fn should_show_error_when_deleting_nonexistent_contact() -> Result<()> {
         clean_database().await.expect("Failed to clean database");
 
@@ -215,7 +210,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[serial]
     async fn should_import_one_contact_when_importing_alice_csv() -> Result<()> {
         clean_database().await.expect("Failed to clean database");
 
@@ -236,7 +230,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[serial]
     async fn should_import_example_csv_with_three_rows() -> Result<()> {
         clean_database().await?;
         let mut cmd = create_command();
@@ -270,7 +263,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[serial]
     async fn should_say_no_contacts_when_contacts_are_empty() -> Result<()> {
         clean_database().await?;
 
@@ -284,7 +276,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[serial]
     async fn should_show_one_contact_when_one_contact_available() -> Result<()> {
         clean_database().await?;
 
@@ -306,7 +297,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[serial]
     async fn should_show_two_contact_when_two_contact_available() -> Result<()> {
         clean_database().await.expect("Failed to clean database");
 
@@ -329,7 +319,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[serial]
     async fn should_accept_a_firstname_and_birthday() {
         clean_database().await.expect("Failed to clean database");
 
@@ -346,7 +335,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[serial]
     async fn should_set_birthday_when_provided() -> Result<()> {
         clean_database().await.expect("Failed to clean database");
 
@@ -374,7 +362,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[serial]
     async fn should_allow_only_first_name_when_creating() -> Result<()> {
         clean_database().await.expect("Failed to clean database");
 
@@ -389,7 +376,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[serial]
     async fn should_say_already_initialized_when_db_exists() -> Result<()> {
         let mut first_cmd = create_command();
         first_cmd.arg("init");
@@ -409,7 +395,6 @@ mod tests {
     }
 
     #[tokio::test]
-    #[serial]
     async fn should_init_create_database_on_fresh_system() -> Result<()> {
         let temp = tempfile::TempDir::new()?;
         let config_dir = temp.path().to_path_buf();
