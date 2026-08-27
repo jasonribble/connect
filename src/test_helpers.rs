@@ -1,7 +1,7 @@
 #[cfg(test)]
 use anyhow::Ok;
 #[cfg(test)]
-use sqlx::{sqlite::SqlitePoolOptions, SqlitePool};
+use sqlx::{sqlite::SqlitePoolOptions, AssertSqlSafe, SqlitePool};
 #[cfg(test)]
 use std::fs;
 
@@ -23,9 +23,11 @@ pub async fn setup_in_memory_db() -> SqlitePool {
         let migration = fs::read_to_string(migration_file_path.clone())
             .expect("Should have been able to read the file");
 
+        let migration = AssertSqlSafe(migration);
+
         let error = format!("Failed to insert {migration_file_path}");
 
-        sqlx::query(&migration).execute(&pool).await.expect(&error);
+        sqlx::query(migration).execute(&pool).await.expect(&error);
     }
 
     pool

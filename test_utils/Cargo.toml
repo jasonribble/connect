@@ -1,8 +1,0 @@
-[package]
-name = "test_utils"
-version = "0.1.0"
-edition = "2024"
-
-[dependencies]
-anyhow = "1.0.98"
-sqlx = "0.8.5"

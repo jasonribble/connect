@@ -193,8 +193,8 @@ impl ContactRepo for Repo<SqlitePool> {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use crate::test_helpers::setup_in_memory_db;
     use mockall::predicate::*;
-    use test_utils::setup_in_memory_db;
 
     #[tokio::test]
     async fn test_save_contact() {
