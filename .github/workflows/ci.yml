@@ -45,7 +45,7 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
       - name: Run CLI tests
-        run: cargo nextest run --test cli
+        run: cargo nextest run --test-threads=1 --test cli
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SQLX_OFFLINE: true
